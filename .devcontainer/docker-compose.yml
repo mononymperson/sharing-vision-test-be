@@ -1,0 +1,38 @@
+services:
+  app:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    build:
+      context: ../
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../:/app
+    environment:
+      - PORT=8080
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=sharing_vision
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sharing_vision
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mysql_data:
