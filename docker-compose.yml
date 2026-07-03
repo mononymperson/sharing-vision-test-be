@@ -4,16 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - "8080:8080"
+      - "${PORT:-8080}:${PORT:-8080}"
     volumes:
       - .:/app
-    environment:
-      - PORT=8080
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_NAME=sharing_vision
+    env_file:
+      - .env
     depends_on:
       mysql:
         condition: service_healthy
@@ -28,7 +23,6 @@ services:
       MYSQL_DATABASE: sharing_vision
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./migration:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s

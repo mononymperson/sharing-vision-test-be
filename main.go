@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -30,6 +31,20 @@ func cors(next http.Handler) http.Handler {
 	})
 }
 
+func runMigration(db *sql.DB) error {
+	query := `CREATE TABLE IF NOT EXISTS posts (
+		id          INT AUTO_INCREMENT PRIMARY KEY,
+		title       VARCHAR(200)  NOT NULL,
+		content     TEXT          NOT NULL,
+		category    VARCHAR(100)  NOT NULL,
+		created_date DATETIME     NOT NULL,
+		updated_date DATETIME     NOT NULL,
+		status      VARCHAR(100)  NOT NULL DEFAULT 'draft'
+	)`
+	_, err := db.Exec(query)
+	return err
+}
+
 func main() {
 	godotenv.Load()
 
@@ -38,6 +53,10 @@ func main() {
 		log.Fatal("failed to connect database: ", err)
 	}
 	defer db.Close()
+
+	if err := runMigration(db); err != nil {
+		log.Fatal("failed to run migration: ", err)
+	}
 
 	articleRepo := article.NewArticleRepository(db)
 	articleService := article.NewArticleService(articleRepo)

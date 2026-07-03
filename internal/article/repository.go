@@ -1,6 +1,9 @@
 package article
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 type ArticleRepository struct {
 	db *sql.DB
@@ -11,9 +14,13 @@ func NewArticleRepository(db *sql.DB) *ArticleRepository {
 }
 
 func (r *ArticleRepository) Create(article *Article) error {
+	now := time.Now()
+	article.CreatedDate = now
+	article.UpdatedDate = now
+
 	result, err := r.db.Exec(
-		`INSERT INTO posts (title, content, category, status) VALUES (?, ?, ?, ?)`,
-		article.Title, article.Content, article.Category, article.Status,
+		`INSERT INTO posts (title, content, category, status, created_date, updated_date) VALUES (?, ?, ?, ?, ?, ?)`,
+		article.Title, article.Content, article.Category, article.Status, article.CreatedDate, article.UpdatedDate,
 	)
 	if err != nil {
 		return err
@@ -65,9 +72,10 @@ func (r *ArticleRepository) FindByID(id int) (*Article, error) {
 }
 
 func (r *ArticleRepository) Update(article *Article) error {
+	article.UpdatedDate = time.Now()
 	_, err := r.db.Exec(
-		`UPDATE posts SET title = ?, content = ?, category = ?, status = ? WHERE id = ?`,
-		article.Title, article.Content, article.Category, article.Status, article.ID,
+		`UPDATE posts SET title = ?, content = ?, category = ?, status = ?, updated_date = ? WHERE id = ?`,
+		article.Title, article.Content, article.Category, article.Status, article.UpdatedDate, article.ID,
 	)
 	return err
 }
