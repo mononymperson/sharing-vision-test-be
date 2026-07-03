@@ -57,7 +57,7 @@ func (h *ArticleHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 
-	articles, err := h.service.FindAll(limit, offset)
+	articles, total, err := h.service.FindAll(limit, offset)
 	if err != nil {
 		common.WriteError(w, err)
 		return
@@ -68,8 +68,11 @@ func (h *ArticleHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	common.WriteJSON(w, &common.Response{
-		Msg:  "success get articles",
-		Data: articles,
+		Msg: "success get articles",
+		Data: map[string]any{
+			"articles": articles,
+			"total":    total,
+		},
 	})
 }
 

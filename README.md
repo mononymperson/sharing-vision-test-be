@@ -2,8 +2,7 @@
 
 ## Prerequisites
 
-- Go 1.22+
-- Docker & Docker Compose (for MySQL)
+- Docker & Docker Compose
 
 ## Quick Start
 
@@ -11,26 +10,19 @@
 # 1. Copy env and adjust if needed
 cp .env.example .env
 
-# 2. Start MySQL
-docker compose up mysql -d
-
-# 3. Run migration
-#    Table is auto-created on first MySQL startup via migration/init.sql.
-#    If MySQL was already running, run manually:
-mysql -u root -p sharing_vision < migration/init.sql
-
-# 4. Start the server
-go mod tidy
-go run main.go
-```
-
-## With Docker Compose (MySQL + App)
-
-```bash
+# 2. Start all services
 docker compose up
 ```
 
-Server runs on `http://localhost:8080`.
+Server runs on `http://localhost:8080`. MySQL auto-starts and migration runs automatically on app boot.
+
+## Seed Data (optional)
+
+Insert 100 dummy articles to test pagination:
+
+```bash
+go run seed/main.go
+```
 
 ## API Endpoints
 

@@ -80,6 +80,12 @@ func (r *ArticleRepository) Update(article *Article) error {
 	return err
 }
 
+func (r *ArticleRepository) Count() (int, error) {
+	var total int
+	err := r.db.QueryRow(`SELECT COUNT(*) FROM posts`).Scan(&total)
+	return total, err
+}
+
 func (r *ArticleRepository) Delete(id int) error {
 	_, err := r.db.Exec(`DELETE FROM posts WHERE id = ?`, id)
 	return err

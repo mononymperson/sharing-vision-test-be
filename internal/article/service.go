@@ -26,8 +26,16 @@ func (s *ArticleService) Create(req *CreateArticleRequest) (*Article, error) {
 	return article, nil
 }
 
-func (s *ArticleService) FindAll(limit, offset int) ([]Article, error) {
-	return s.repo.FindAll(limit, offset)
+func (s *ArticleService) FindAll(limit, offset int) ([]Article, int, error) {
+	articles, err := s.repo.FindAll(limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	total, err := s.repo.Count()
+	if err != nil {
+		return nil, 0, err
+	}
+	return articles, total, nil
 }
 
 func (s *ArticleService) FindByID(id int) (*Article, error) {
